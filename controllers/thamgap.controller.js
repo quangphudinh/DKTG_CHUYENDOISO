@@ -1,4 +1,52 @@
 const { ThamGap } = require('../models');
+const { CPN } = require('../models');
+
+// [API] - ĐĂNG KÝ THĂM GẶP MỚI
+exports.createThamGap = async (req, res) => {
+  try {
+    const { thamGapId, cpnId, thanNhanId, ngayDangKyThamGap } = req.body;
+    console.log(req.body);
+    // 1. Kiểm tra Can phạm nhân có tồn tại không
+    const cpn = await CPN.findOne({ cpnId: cpnId });
+    if (!cpn) {
+      return res.json({ Status: false, Res: "Không tìm thấy Can phạm nhân với mã ID này." });
+    }
+
+    // 2. Kiểm tra Thân nhân có nằm trong danh sách của CPN này không
+    const thanNhan = cpn.thanNhan.find(tn => tn.thanNhanId === thanNhanId);
+    if (!thanNhan) {
+      return res.json({ Status: false, Res: "Thân nhân không hợp lệ hoặc không có trong hồ sơ của Can phạm nhân." });
+    }
+
+    // 3. Tạo phiếu đăng ký thăm gặp mới
+    const newThamGap = new ThamGap({
+      thamGapId: thamGapId || `TG${Date.now()}`, // Tự sinh mã nếu không truyền lên
+      thongTinCPN: {
+        cpnId: cpn.cpnId,
+        hoTen: cpn.hoTen,
+        cccd: cpn.cccd
+      },
+      thongTinThanNhan: {
+        thanNhanId: thanNhan.thanNhanId,
+        hoTen: thanNhan.hoTen,
+        quanHe: thanNhan.quanHe,
+        sdt: thanNhan.sdt
+      },
+      ngayDangKyThamGap: ngayDangKyThamGap || new Date(),
+      trangThai: 'Chờ duyệt' // Mặc định khi mới tạo là Chờ duyệt
+    });
+
+    await newThamGap.save();
+
+    return res.status(201).json({
+      Status: true,
+      Res: newThamGap
+    });
+
+  } catch (error) {
+    return res.status(500).json({ Status: false, Res: error.message });
+  }
+};
 
 // Lấy toàn bộ danh sách & Lọc
 exports.getThamGaps = async (req, res) => {
@@ -24,9 +72,9 @@ exports.getThamGaps = async (req, res) => {
     }
 
     const danhSach = await ThamGap.find(query).sort({ ngayDangKyThamGap: -1 });
-    res.json(danhSach);
+    return res.json({ Status: true, Res: danhSach });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ Status: false, Res: error.message });
   }
 };
 
@@ -44,9 +92,9 @@ exports.getThamGapByCPN = async (req, res) => {
     }
 
     const danhSach = await ThamGap.find(query).sort({ ngayDangKyThamGap: -1 });
-    res.json(danhSach);
+    return res.json({ Status: true, Res: danhSach });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ Status: false, Res: error.message });
   }
 };
 
@@ -59,8 +107,13 @@ exports.updateTrangThai = async (req, res) => {
       { $set: { trangThai: trangThai } },
       { new: true }
     );
-    res.json(updatedThamGap);
+
+    if (!updatedThamGap) {
+      return res.status(404).json({ Status: false, Res: "Không tìm thấy thông tin đăng ký thăm gặp này." });
+    }
+
+    return res.json({ Status: true, Res: updatedThamGap });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ Status: false, Res: error.message });
   }
 };

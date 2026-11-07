@@ -9,9 +9,9 @@ exports.getCPNs = async (req, res) => {
     if (cccd) query.cccd = cccd;
 
     const listCPN = await CPN.find(query);
-    res.json(listCPN);
+    return res.json({ Status: true, Res: listCPN });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ Status: false, Res: error.message });
   }
 };
 
@@ -20,9 +20,9 @@ exports.createCPN = async (req, res) => {
   try {
     const newCPN = new CPN(req.body);
     await newCPN.save();
-    res.status(201).json(newCPN);
+    return res.status(201).json({ Status: true, Res: newCPN });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ Status: false, Res: error.message });
   }
 };
 
@@ -34,18 +34,28 @@ exports.updateCPN = async (req, res) => {
       req.body,
       { new: true }
     );
-    res.json(updatedCPN);
+
+    if (!updatedCPN) {
+      return res.status(404).json({ Status: false, Res: "Không tìm thấy CPN với ID này." });
+    }
+
+    return res.json({ Status: true, Res: updatedCPN });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ Status: false, Res: error.message });
   }
 };
 
 // Xóa
 exports.deleteCPN = async (req, res) => {
   try {
-    await CPN.findOneAndDelete({ cpnId: req.params.id });
-    res.json({ message: 'Đã xóa CPN thành công' });
+    const deletedCPN = await CPN.findOneAndDelete({ cpnId: req.params.id });
+
+    if (!deletedCPN) {
+      return res.status(404).json({ Status: false, Res: "Không tìm thấy CPN để xóa." });
+    }
+
+    return res.json({ Status: true, Res: 'Đã xóa CPN thành công' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ Status: false, Res: error.message });
   }
 };

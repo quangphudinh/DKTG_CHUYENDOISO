@@ -48,11 +48,53 @@ router.get('/cpn/:cpnId', thamgapController.getThamGapByCPN);
  *       - in: path
  *         name: thamGapId
  *         required: true
- *         schema: { type: string }
+ *         schema: 
+ *           type: string
+ *         example: "TG001"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - trangThai
+ *             properties:
+ *               trangThai:
+ *                 type: string
+ *                 enum: ['Chờ duyệt', 'Đã duyệt', 'Từ chối', 'Hoàn thành']
+ *             example:
+ *               trangThai: "Đã duyệt"
  *     responses:
  *       200:
- *         description: Cập nhật thành công
+ *         description: Cập nhật trạng thái thành công
  */
 router.put('/:thamGapId', thamgapController.updateTrangThai);
+
+/**
+ * @swagger
+ * /api/thamgap:
+ *   post:
+ *     summary: Tạo phiếu đăng ký thăm gặp mới
+ *     tags: [Thăm Gặp]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - cpnId
+ *               - thanNhanId
+ *               - ngayDangKyThamGap
+ *             example:
+ *               cpnId: "CPN001"
+ *               thanNhanId: "TN001"
+ *               ngayDangKyThamGap: "2026-11-20T08:30:00.000Z"
+ *     responses:
+ *       201:
+ *         description: Trả về thông tin phiếu thăm gặp vừa tạo (Status, Res)
+ */
+router.post('/', thamgapController.createThamGap);
 
 module.exports = router;
