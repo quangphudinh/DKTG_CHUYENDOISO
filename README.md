@@ -9,37 +9,6 @@
 - **Authentication:** JWT (JSON Web Token) & bcryptjs
 - **API Documentation:** Swagger UI (swagger-jsdoc & swagger-ui-express)
 
-## 📁 Cấu trúc dự án (MVC)
-
-\`\`\`text
-quan-ly-cpn/
-│
-├── controllers/            # Nơi chứa toàn bộ logic xử lý API
-│   ├── auth.controller.js  # Xử lý Đăng ký, Đăng nhập, Khóa/Mở tài khoản
-│   ├── cpn.controller.js   # Xử lý CRUD hồ sơ Can Phạm Nhân
-│   └── thamgap.controller.js # Xử lý Đăng ký & Xét duyệt thăm gặp
-│
-├── models/                 # Định nghĩa cấu trúc dữ liệu Database (Schema)
-│   ├── index.js            # Gom các model lại để export chung
-│   ├── cpn.model.js        # Lược đồ Can Phạm Nhân & Thân Nhân
-│   ├── taikhoan.model.js   # Lược đồ Tài khoản
-│   └── thamgap.model.js    # Lược đồ Đăng ký Thăm gặp
-│
-├── routes/                 # Định tuyến API URL và cấu hình Swagger Docs
-│   ├── index.js            # Gom nhóm các route
-│   ├── auth.routes.js      
-│   ├── cpn.routes.js       
-│   └── thamgap.routes.js   
-│
-├── utils/                  # Chứa các hàm/biến tiện ích dùng chung
-│   └── constants.js        # Chứa hằng số (TRANG_THAI_THAM_GAP, ROLE)
-│
-├── .env                    # Biến môi trường (Chứa JWT_SECRET, MONGO_URI) - Không push lên Git
-├── .gitignore              
-├── index.js                # File chạy chính của Server
-└── package.json            # Quản lý thư viện
-\`\`\`
-
 ## ⚙️ Hướng dẫn cài đặt & Khởi chạy
 
 ### 1. Yêu cầu hệ thống
