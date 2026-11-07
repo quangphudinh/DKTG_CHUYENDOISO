@@ -15,10 +15,23 @@ exports.getCPNs = async (req, res) => {
   }
 };
 
-// Thêm mới
+// Thêm mới CPN
 exports.createCPN = async (req, res) => {
   try {
-    const newCPN = new CPN(req.body);
+    const cpnData = req.body;
+
+    // Kiểm tra nếu có truyền lên mảng thanNhan thì tự động generate thanNhanId
+    if (cpnData.thanNhan && Array.isArray(cpnData.thanNhan)) {
+      cpnData.thanNhan = cpnData.thanNhan.map((tn, index) => {
+        return {
+          ...tn,
+          // Tự sinh ID dựa trên timestamp và index để đảm bảo không bao giờ trùng
+          thanNhanId: `TN${Date.now()}${index}`
+        };
+      });
+    }
+
+    const newCPN = new CPN(cpnData);
     await newCPN.save();
     return res.status(201).json({ Status: true, Res: newCPN });
   } catch (error) {
