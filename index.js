@@ -15,12 +15,18 @@ app.use(express.json());
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
-    info: {
-      title: 'API Hệ thống Quản lý CPN',
-      version: '1.0.0',
+    info: { title: 'API Hệ thống Quản lý CPN', version: '1.0.0' },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        }
+      }
     },
+    security: [{ bearerAuth: [] }]
   },
-  // Trỏ Swagger tìm tài liệu trong toàn bộ các file js trong thư mục routes
   apis: ['./routes/*.js'],
 };
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
+const { verifyToken } = require('../middlewares/auth.middleware');
 
 /**
  * @swagger
@@ -91,5 +92,48 @@ router.put('/lock/:taiKhoanId', authController.lockAccount);
  *         description: Trả về trạng thái mở khóa thành công
  */
 router.put('/unlock/:taiKhoanId', authController.unlockAccount);
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Lấy thông tin tài khoản đang đăng nhập
+ *     tags: [Xác thực]
+ *     responses: { 200: { description: "Thành công" } }
+ */
+router.get('/me', verifyToken, authController.getMe);
+
+/**
+ * @swagger
+ * /api/auth/danh-sach:
+ *   get:
+ *     summary: Lấy toàn bộ danh sách tài khoản (Admin)
+ *     tags: [Xác thực]
+ *     responses: { 200: { description: "Thành công" } }
+ */
+router.get('/danh-sach', verifyToken, authController.getDanhSachTaiKhoan);
+
+/**
+ * @swagger
+ * /api/auth/doi-mat-khau:
+ *   put:
+ *     summary: Đổi mật khẩu
+ *     tags: [Xác thực]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               matKhauCu: { type: string }
+ *               matKhauMoi: { type: string }
+ *     responses: { 200: { description: "Thành công" } }
+ */
+router.put('/doi-mat-khau', verifyToken, authController.doiMatKhau);
+
+router.get('/me', verifyToken, authController.getMe);
+router.get('/danh-sach', verifyToken, authController.getDanhSachTaiKhoan);
+router.put('/doi-mat-khau', verifyToken, authController.doiMatKhau);
 
 module.exports = router;

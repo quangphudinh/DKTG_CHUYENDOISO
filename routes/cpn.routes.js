@@ -99,4 +99,73 @@ router.put('/:id', cpnController.updateCPN);
  */
 router.delete('/:id', cpnController.deleteCPN);
 
+/**
+ * @swagger
+ * /api/cpn/{cpnId}/thannhan:
+ *   post:
+ *     summary: Thêm thân nhân cho 1 CPN
+ *     tags: [CPN]
+ *     parameters:
+ *       - in: path
+ *         name: cpnId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               hoTen: { type: string }
+ *               cccd: { type: string }
+ *               quanHe: { type: string }
+ *               noiThuongTru: { type: string }
+ *               sdt: { type: string }
+ *     responses: { 201: { description: "Thành công" } }
+ */
+router.post('/:cpnId/thannhan', cpnController.addThanNhan);
+
+/**
+ * @swagger
+ * /api/cpn/{cpnId}/thannhan/{thanNhanId}:
+ *   put:
+ *     summary: Sửa thông tin thân nhân
+ *     tags: [CPN]
+ *     parameters:
+ *       - in: path
+ *         name: cpnId
+ *         required: true
+ *         schema: { type: string }
+ *       - in: path
+ *         name: thanNhanId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sdt: { type: string }
+ *               noiThuongTru: { type: string }
+ *     responses: { 200: { description: "Thành công" } }
+ *   delete:
+ *     summary: Xóa thân nhân
+ *     tags: [CPN]
+ *     parameters:
+ *       - in: path
+ *         name: cpnId
+ *         required: true
+ *         schema: { type: string }
+ *       - in: path
+ *         name: thanNhanId
+ *         required: true
+ *         schema: { type: string }
+ *     responses: { 200: { description: "Thành công" } }
+ */
+router.put('/:cpnId/thannhan/:thanNhanId', cpnController.updateThanNhan);
+router.delete('/:cpnId/thannhan/:thanNhanId', cpnController.deleteThanNhan);
+
 module.exports = router;

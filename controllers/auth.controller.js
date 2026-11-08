@@ -149,3 +149,51 @@ exports.unlockAccount = async (req, res) => {
     return res.status(500).json({ Status: false, Res: error.message });
   }
 };
+
+// [API] - LẤY THÔNG TIN CÁ NHÂN (GET /me)
+exports.getMe = async (req, res) => {
+  try {
+    // req.user được lấy từ middleware verifyToken
+    const taiKhoan = await TaiKhoan.findOne({ taiKhoanId: req.user.taiKhoanId }).select('-matKhau');
+    if (!taiKhoan) return res.status(404).json({ Status: false, Res: "Không tìm thấy tài khoản." });
+
+    return res.json({ Status: true, Res: taiKhoan });
+  } catch (error) {
+    return res.status(500).json({ Status: false, Res: error.message });
+  }
+};
+
+// [API] - LẤY DANH SÁCH TÀI KHOẢN (Chỉ dành cho Admin)
+exports.getDanhSachTaiKhoan = async (req, res) => {
+  try {
+    if (!req.user.adminRole) {
+      return res.status(403).json({ Status: false, Res: "Bạn không có quyền thực hiện chức năng này." });
+    }
+    const danhSach = await TaiKhoan.find({ adminRole: { $ne: true } })
+      .select("-matKhau")
+      .sort({ ngayTao: -1 });
+
+    return res.json({ Status: true, Res: danhSach });
+  } catch (error) {
+    return res.status(500).json({ Status: false, Res: error.message });
+  }
+};
+
+// [API] - ĐỔI MẬT KHẨU
+exports.doiMatKhau = async (req, res) => {
+  try {
+    const { matKhauCu, matKhauMoi } = req.body;
+    const taiKhoan = await TaiKhoan.findOne({ taiKhoanId: req.user.taiKhoanId });
+
+    const isMatch = await bcrypt.compare(matKhauCu, taiKhoan.matKhau);
+    if (!isMatch) return res.json({ Status: false, Res: "Mật khẩu cũ không chính xác." });
+
+    const salt = await bcrypt.genSalt(10);
+    taiKhoan.matKhau = await bcrypt.hash(matKhauMoi, salt);
+    await taiKhoan.save();
+
+    return res.json({ Status: true, Res: "Đổi mật khẩu thành công." });
+  } catch (error) {
+    return res.status(500).json({ Status: false, Res: error.message });
+  }
+};

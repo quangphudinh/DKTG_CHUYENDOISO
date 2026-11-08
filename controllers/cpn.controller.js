@@ -72,3 +72,55 @@ exports.deleteCPN = async (req, res) => {
     return res.status(500).json({ Status: false, Res: error.message });
   }
 };
+
+// [API] - THÊM THÂN NHÂN MỚI
+exports.addThanNhan = async (req, res) => {
+  try {
+    const cpn = await CPN.findOne({ cpnId: req.params.cpnId });
+    if (!cpn) return res.status(404).json({ Status: false, Res: "Không tìm thấy CPN." });
+
+    const newThanNhan = {
+      ...req.body,
+      thanNhanId: `TN${Date.now()}`
+    };
+    cpn.thanNhan.push(newThanNhan);
+    await cpn.save();
+    return res.status(201).json({ Status: true, Res: newThanNhan });
+  } catch (error) {
+    return res.status(400).json({ Status: false, Res: error.message });
+  }
+};
+
+// [API] - SỬA THÂN NHÂN
+exports.updateThanNhan = async (req, res) => {
+  try {
+    const { cpnId, thanNhanId } = req.params;
+    const cpn = await CPN.findOne({ cpnId });
+    if (!cpn) return res.status(404).json({ Status: false, Res: "Không tìm thấy CPN." });
+
+    const index = cpn.thanNhan.findIndex(tn => tn.thanNhanId === thanNhanId);
+    if (index === -1) return res.status(404).json({ Status: false, Res: "Không tìm thấy Thân nhân." });
+
+    // Cập nhật dữ liệu mới
+    cpn.thanNhan[index] = { ...cpn.thanNhan[index].toObject(), ...req.body };
+    await cpn.save();
+    return res.json({ Status: true, Res: cpn.thanNhan[index] });
+  } catch (error) {
+    return res.status(400).json({ Status: false, Res: error.message });
+  }
+};
+
+// [API] - XÓA THÂN NHÂN
+exports.deleteThanNhan = async (req, res) => {
+  try {
+    const { cpnId, thanNhanId } = req.params;
+    const cpn = await CPN.findOne({ cpnId });
+    if (!cpn) return res.status(404).json({ Status: false, Res: "Không tìm thấy CPN." });
+
+    cpn.thanNhan = cpn.thanNhan.filter(tn => tn.thanNhanId !== thanNhanId);
+    await cpn.save();
+    return res.json({ Status: true, Res: "Đã xóa thân nhân thành công." });
+  } catch (error) {
+    return res.status(500).json({ Status: false, Res: error.message });
+  }
+};
